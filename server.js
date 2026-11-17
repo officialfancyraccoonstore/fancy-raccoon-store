@@ -411,13 +411,16 @@ function siteUrl(req) {
 
 const INDEX_PATH = path.join(__dirname, 'public', 'index.html');
 
-// Home page gets absolute URLs (canonical + Open Graph) filled in from the request host.
-app.get(['/', '/index.html'], (req, res, next) => {
-  fs.readFile(INDEX_PATH, 'utf8', (err, html) => {
+// Pages that carry absolute URLs (canonical + Open Graph) get them filled in from the request host.
+function sendPage(req, res, next, file) {
+  fs.readFile(path.join(__dirname, 'public', file), 'utf8', (err, html) => {
     if (err) return next(err);
     res.type('html').send(html.replace(/__SITE_URL__/g, siteUrl(req)));
   });
-});
+}
+
+app.get(['/', '/index.html'], (req, res, next) => sendPage(req, res, next, 'index.html'));
+app.get(['/about', '/about.html'], (req, res, next) => sendPage(req, res, next, 'about.html'));
 
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(
@@ -432,6 +435,7 @@ app.get('/sitemap.xml', (req, res) => {
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
       `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
       `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n` +
+      `  <url>\n    <loc>${base}/about</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>\n` +
       `</urlset>\n`
   );
 });

@@ -1,5 +1,11 @@
 # Fancy Raccoon
 
+Company: Fancy Raccoon (also written "Fancy Raccoon Store").
+Type: made-to-order football jersey studio and retailer, based in India, shipping to India and Nepal.
+Customers: football fans in India and Nepal ordering club and national team jerseys.
+Contact: officialfancyraccoon.store@gmail.com
+About page: /about
+
 > Fancy Raccoon is a custom football jersey studio for India and Nepal. Customers choose a
 > European club or national team jersey, pick a size, add their own name and number, upload
 > reference photos or describe the design they want, and the studio prints it. Two options per

@@ -46,6 +46,7 @@
       <a href="#customise">Customise</a>
       <a href="#genuine">Genuine kits</a>
       <a href="#faq">FAQ</a>
+      <a href="/about">About</a>
     </nav>
     <div class="header-actions">
       <a class="ghost-pill" href="#collection">From ₹499</a>
@@ -345,6 +346,7 @@
       <h4>Help</h4>
       <a href="#faq">Shipping &amp; delivery</a>
       <a href="#faq">Customisation</a>
+      <a href="/about">About the studio</a>
       <a href="mailto:officialfancyraccoon.store@gmail.com">officialfancyraccoon.store@gmail.com</a>
       <a href="/admin">Admin dashboard</a>
     </div>
@@ -490,6 +492,45 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "__SITE_URL__/#organization",
+      "name": "Fancy Raccoon",
+      "alternateName": "Fancy Raccoon Store",
+      "url": "__SITE_URL__/",
+      "logo": { "@type": "ImageObject", "url": "__SITE_URL__/img/logo.png", "width": 512, "height": 512 },
+      "image": "__SITE_URL__/img/og-cover.png",
+      "email": "officialfancyraccoon.store@gmail.com",
+      "description": "Fancy Raccoon is a made-to-order football jersey studio for India and Nepal. Fan-made look-alike jerseys start at ₹499; original genuine kits are sold at their actual price. Every jersey can be personalised with a name, number and custom design.",
+      "slogan": "Made your way",
+      "areaServed": [
+        { "@type": "Country", "name": "India" },
+        { "@type": "Country", "name": "Nepal" }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "officialfancyraccoon.store@gmail.com",
+        "areaServed": ["IN", "NP"],
+        "availableLanguage": ["en", "hi"]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "__SITE_URL__/#website",
+      "url": "__SITE_URL__/",
+      "name": "Fancy Raccoon",
+      "alternateName": "Fancy Raccoon Store",
+      "inLanguage": "en-IN",
+      "publisher": { "@id": "__SITE_URL__/#organization" }
+    }
+  ]
+}
+</script>
 <script src="/js/app.js" defer></script>
 </body>
 </html>
