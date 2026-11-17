@@ -51,6 +51,7 @@ p{margin:0}
   font-family:var(--display);font-size:20px;letter-spacing:.5px;
   box-shadow:0 8px 24px -8px rgba(200,255,77,.7);
 }
+.brand-logo{width:46px;height:46px;border-radius:50%;flex-shrink:0;filter:drop-shadow(0 6px 16px rgba(0,0,0,.55))}
 .brand-text strong{display:block;font-family:var(--display);font-size:17px;letter-spacing:1.2px}
 .brand-text small{display:block;font-size:10px;letter-spacing:2.4px;color:var(--muted);text-transform:uppercase}
 .main-nav{display:flex;gap:26px;margin-left:auto;font-size:14px;color:#c7ccd6}

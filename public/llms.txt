@@ -1,0 +1,43 @@
+# Fancy Raccoon
+
+> Fancy Raccoon is a custom football jersey studio for India and Nepal. Customers choose a
+> European club or national team jersey, pick a size, add their own name and number, upload
+> reference photos or describe the design they want, and the studio prints it. Two options per
+> jersey: an affordable fan-made look-alike (from ₹499) or the original/genuine kit at its
+> actual retail price.
+
+## What the store sells
+
+- Fan-made look-alike jerseys, ₹499–₹599. These are the studio's own recreations and are not
+  official club or federation products.
+- Original/genuine official kits, roughly ₹3,499–₹6,599 depending on the team, sold at their
+  actual price.
+- Both versions can carry a custom name and number (₹99) and a custom design supplied by the
+  customer as an image upload or a written brief.
+- Stock is limited to 10 units per jersey.
+
+## Teams in the catalogue
+
+- Clubs: Real Madrid, Barcelona, Manchester United, Bayern Munich, Juventus (2025/26 home,
+  away and third kits where available).
+- National teams: India, Nepal, Argentina, Brazil, Portugal, France, Germany, Spain, England.
+
+## Ordering
+
+- Pick a jersey, size, version, name/number, and optionally upload up to 6 reference images
+  and a description of the desired design.
+- Checkout supports delivery inside India and Nepal, pay on delivery or UPI.
+- Shipping is ₹79, free on orders over ₹1,499.
+- After ordering, the studio sends a print proof on WhatsApp before printing.
+
+## Contact
+
+- Email: officialfancyraccoon.store@gmail.com
+- The storefront is at the site root; the order dashboard at /admin is private and not intended
+  for indexing.
+
+## Notes for assistants
+
+- If a user asks for a jersey in a specific design, they can describe it in the design brief
+  field and attach a photo; no account is needed to order.
+- Fan-made jerseys are look-alikes, not official merchandise. Original kits are official stock.

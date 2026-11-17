@@ -687,7 +687,7 @@
       const emailed = res.email && res.email.status === 'sent';
       $('#successCopy').textContent = emailed
         ? `Your order and reference images have been sent to ${res.email.ownerEmail}, and a confirmation is on its way to ${order.customer.email}. Our team will send a print proof on WhatsApp within 24 hours.`
-        : `Your order is confirmed and our studio has been notified. We'll send a print proof on WhatsApp within 24 hours. A confirmation is on its way to ${order.customer.email}.`;
+        : `Your order is confirmed and our studio has been notified. We'll send a print proof on WhatsApp within 24 hours. Save your order code ${order.code} — that's all you need if you want to check in.`;
       $('#checkoutView').hidden = true;
       $('#successView').hidden = false;
       form.reset();

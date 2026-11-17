@@ -140,7 +140,7 @@
     $('#emailStatus').className = `email-status ${configured ? 'ok' : 'warn'}`;
     $('#emailStatus').innerHTML = configured
       ? `✔ Orders emailing to ${esc(payload.ownerEmail)}`
-      : `⚠ Email not connected — orders are saved here. Add SMTP_PASS to .env`;
+      : `Orders are saved here — email notifications are off`;
   }
 
   function renderStatusFilters() {
@@ -265,7 +265,7 @@
           }.</div>`
         : order.emailStatus === 'failed'
         ? `<div class="mail-banner err">⚠ Email delivery failed${order.emailDetail ? `: ${esc(order.emailDetail)}` : ''}. The order is saved — use “Resend email”.</div>`
-        : `<div class="mail-banner warn">⚠ Email is not connected yet. Add <strong>SMTP_USER</strong> and <strong>SMTP_PASS</strong> to the .env file, restart, then use “Resend email”.</div>`;
+        : `<div class="mail-banner warn">Email notifications are off. Every order, customer detail and reference photo is saved here in the dashboard — open <strong>Orders</strong> to manage them. You can switch email on later at any time (see the setup guide).</div>`;
 
     $('#orderDetail').innerHTML = `
       <div class="detail-head">

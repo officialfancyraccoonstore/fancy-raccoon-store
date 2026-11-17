@@ -402,6 +402,40 @@ app.patch('/api/admin/products/:id', requireAdmin, (req, res) => {
   res.json({ product });
 });
 
+// ------------------------------------------------------- SEO / crawler files
+function siteUrl(req) {
+  const proto = String(req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
+  const host = req.get('host');
+  return `${proto}://${host}`;
+}
+
+const INDEX_PATH = path.join(__dirname, 'public', 'index.html');
+
+// Home page gets absolute URLs (canonical + Open Graph) filled in from the request host.
+app.get(['/', '/index.html'], (req, res, next) => {
+  fs.readFile(INDEX_PATH, 'utf8', (err, html) => {
+    if (err) return next(err);
+    res.type('html').send(html.replace(/__SITE_URL__/g, siteUrl(req)));
+  });
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(
+    `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const base = siteUrl(req);
+  const today = new Date().toISOString().slice(0, 10);
+  res.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+      `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n` +
+      `</urlset>\n`
+  );
+});
+
 // ------------------------------------------------------------------ static
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
