@@ -26,8 +26,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v=5">
-<link rel="stylesheet" href="/css/theme.css?v=5">
+<link rel="stylesheet" href="/css/styles.css?v=6">
+<link rel="stylesheet" href="/css/theme.css?v=6">
 <link rel="icon" href="/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 </head>
@@ -128,6 +128,29 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
         <div><strong>Printed in 5–7 days</strong><span>Heat-pressed names &amp; numbers</span></div>
       </div>
+    </div>
+  </section>
+
+  <!-- 3D RACK -->
+  <section class="shell section" id="showcase">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Spin the rack</p>
+        <h2>See it from<br>every angle.</h2>
+      </div>
+      <p class="section-note">The kits we are pressing this week, standing up in 3D. Drag with your finger or your mouse to spin the rack, tap the jersey at the front to open it.</p>
+    </div>
+    <div class="stage" id="stage" aria-roledescription="carousel" aria-label="3D jersey rack">
+      <div class="stage-glow" aria-hidden="true"></div>
+      <div class="stage-floor" aria-hidden="true"></div>
+      <div class="stage-particles" id="stageParticles" aria-hidden="true"></div>
+      <div class="stage-ring" id="stageRing"></div>
+      <button class="stage-arrow prev" id="stagePrev" type="button" aria-label="Previous jersey">←</button>
+      <button class="stage-arrow next" id="stageNext" type="button" aria-label="Next jersey">→</button>
+    </div>
+    <div class="stage-ui">
+      <span class="stage-hint">Drag to spin · tap the front jersey to open it</span>
+      <span class="stage-count" id="stageCount">8 kits</span>
     </div>
   </section>
 
@@ -568,8 +591,8 @@
   ]
 }
 </script>
-<script src="/js/app.js?v=5" defer></script>
-<script src="/js/palette.js?v=5" defer></script>
-<script src="/js/theme.js?v=5" defer></script>
+<script src="/js/app.js?v=6" defer></script>
+<script src="/js/palette.js?v=6" defer></script>
+<script src="/js/theme.js?v=6" defer></script>
 </body>
 </html>

@@ -339,6 +339,220 @@
     }
   }
 
+  /* --------------------------------------------------------- 3D rack */
+  const stageState = { items: [], index: 0, angle: 0, step: 45, dragging: false, visible: true, raf: 0, last: 0, front: -1, pausedUntil: 0 };
+  let stageObserver = null;
+  let stageSnapTimer = 0;
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function stageFront() {
+    const n = stageState.items.length || 1;
+    return ((Math.round(stageState.angle / stageState.step) % n) + n) % n;
+  }
+
+  function stagePicks() {
+    const seen = new Set();
+    const out = [];
+    const ranked = state.products.slice().sort((a, b) => (b.sold || 0) - (a.sold || 0));
+    for (const p of ranked) {
+      if (seen.has(p.team)) continue;
+      seen.add(p.team);
+      out.push(p);
+      if (out.length === 8) break;
+    }
+    return out;
+  }
+
+  function sizeStage() {
+    const ring = $('#stageRing');
+    if (!ring || !stageState.items.length) return;
+    const w = window.innerWidth;
+    const cardW = w < 620 ? 150 : w < 1000 ? 168 : 190;
+    const radius = Math.round(cardW / 2 / Math.tan(Math.PI / stageState.items.length)) + (w < 620 ? 30 : 90);
+    ring.style.setProperty('--cw', `${cardW}px`);
+    ring.style.setProperty('--ch', `${Math.round(cardW * 1.42)}px`);
+    ring.style.setProperty('--radius', `${radius}px`);
+    ring.style.setProperty('--step', `${stageState.step}deg`);
+  }
+
+  function paintStage() {
+    const ring = $('#stageRing');
+    if (!ring) return;
+    ring.style.setProperty('--spin', String(-stageState.angle));
+    const front = stageFront();
+    if (front === stageState.front) return;
+    stageState.front = front;
+    $$('#stageRing .stage-card').forEach((card, i) => card.classList.toggle('is-active', i === front));
+    const count = $('#stageCount');
+    if (count) count.textContent = `${front + 1} / ${stageState.items.length} kits`;
+  }
+
+  function stageSnapTo(target) {
+    const ring = $('#stageRing');
+    const n = stageState.items.length;
+    if (!ring || !n) return;
+    const idx = ((Math.round(target) % n) + n) % n;
+    let angle = Math.round(stageState.angle / 360) * 360 + idx * stageState.step;
+    while (angle - stageState.angle > 180) angle -= 360;
+    while (stageState.angle - angle > 180) angle += 360;
+    stageState.angle = angle;
+    stageState.index = idx;
+    stageState.pausedUntil = Date.now() + 5000;
+    ring.classList.add('is-snapping');
+    paintStage();
+    clearTimeout(stageSnapTimer);
+    stageSnapTimer = setTimeout(() => ring.classList.remove('is-snapping'), 600);
+  }
+
+  function startStageAuto() {
+    cancelAnimationFrame(stageState.raf);
+    stageState.last = 0;
+    if (reducedMotion()) return;
+    const tick = (now) => {
+      if (!stageState.last) stageState.last = now;
+      const dt = Math.min(80, now - stageState.last) / 1000;
+      stageState.last = now;
+      const canSpin = !document.hidden && stageState.visible && !stageState.dragging && Date.now() > stageState.pausedUntil;
+      if (canSpin) {
+        stageState.angle += dt * 7;
+        paintStage();
+      }
+      stageState.raf = requestAnimationFrame(tick);
+    };
+    stageState.raf = requestAnimationFrame(tick);
+  }
+
+  function renderShowcase() {
+    const ring = $('#stageRing');
+    if (!ring || !state.products.length) return;
+    const picks = stagePicks();
+    if (!picks.length) return;
+    stageState.items = picks;
+    stageState.step = 360 / picks.length;
+    stageState.angle = 0;
+    stageState.front = -1;
+    stageState.index = 0;
+
+    ring.innerHTML = picks
+      .map(
+        (p, i) => `<button class="stage-card" type="button" data-stage="${i}" style="--i:${i}" aria-label="Open ${esc(p.name)}">
+          <span class="sc-visual">${jerseySVG(p)}</span>
+          <span class="sc-team">${esc(p.team)}</span>
+          <span class="sc-name">${esc(p.name)}</span>
+          <span class="sc-price">${money(p.prices.fan)}<em>fan-made</em></span>
+        </button>`
+      )
+      .join('');
+
+    const parts = $('#stageParticles');
+    if (parts) {
+      const tones = ['var(--pop)', 'var(--ink)', 'var(--sw1)', 'var(--sw3)'];
+      parts.innerHTML = Array.from(
+        { length: 14 },
+        (_, i) =>
+          `<i style="left:${(i * 37 + 9) % 92}%;top:${(i * 53 + 6) % 84}%;--s:${5 + (i % 5) * 5}px;--dur:${11 + (i % 6) * 2}s;--delay:${(i % 7) * -1.7}s;--c:${tones[i % 4]}"></i>`
+      ).join('');
+    }
+
+    sizeStage();
+    paintStage();
+    startStageAuto();
+    if ('IntersectionObserver' in window) {
+      if (stageObserver) stageObserver.disconnect();
+      stageObserver = new IntersectionObserver(
+        (entries) => entries.forEach((entry) => { stageState.visible = entry.isIntersecting; }),
+        { threshold: 0.12 }
+      );
+      stageObserver.observe($('#stage'));
+    }
+  }
+
+  function wireStage() {
+    const el = $('#stage');
+    if (!el || el.dataset.wired) return;
+    el.dataset.wired = '1';
+    let drag = null;
+
+    el.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      drag = { x: event.clientX, angle: stageState.angle, moved: 0 };
+      stageState.dragging = true;
+      el.classList.add('is-dragging');
+      if (el.setPointerCapture) el.setPointerCapture(event.pointerId);
+    });
+
+    el.addEventListener('pointermove', (event) => {
+      if (!drag) return;
+      const dx = event.clientX - drag.x;
+      drag.moved = Math.max(drag.moved, Math.abs(dx));
+      stageState.angle = drag.angle - dx * 0.3;
+      const ring = $('#stageRing');
+      if (ring) ring.classList.remove('is-snapping');
+      paintStage();
+    });
+
+    const endDrag = () => {
+      if (!drag) return;
+      const moved = drag.moved;
+      drag = null;
+      stageState.dragging = false;
+      el.classList.remove('is-dragging');
+      stageState.pausedUntil = Date.now() + 5000;
+      if (moved > 8) {
+        el.dataset.suppressClick = '1';
+        setTimeout(() => {
+          delete el.dataset.suppressClick;
+        }, 80);
+        stageSnapTo(Math.round(stageState.angle / stageState.step));
+      }
+    };
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+    el.addEventListener('pointerleave', (event) => {
+      if (event.pointerType === 'mouse' && !event.buttons) endDrag();
+    });
+
+    el.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-stage]');
+      if (!card) return;
+      if (el.dataset.suppressClick) {
+        event.preventDefault();
+        return;
+      }
+      const idx = Number(card.dataset.stage);
+      if (idx !== stageFront()) {
+        stageSnapTo(idx);
+        return;
+      }
+      const product = stageState.items[idx];
+      if (product) openProduct(product.id);
+    });
+
+    el.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        stageSnapTo(stageFront() + 1);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        stageSnapTo(stageFront() - 1);
+      }
+    });
+
+    const prev = $('#stagePrev');
+    const next = $('#stageNext');
+    if (prev) prev.addEventListener('click', () => stageSnapTo(stageFront() - 1));
+    if (next) next.addEventListener('click', () => stageSnapTo(stageFront() + 1));
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        sizeStage();
+        paintStage();
+      }, 160);
+    });
+  }
+
   function renderCart() {
     const body = $('#cartBody');
     const totals = cartTotals(state.cart);
@@ -816,6 +1030,8 @@
       if (product) openProduct(product.id);
     });
 
+    wireStage();
+
     // product modal
     $('#pmClose').addEventListener('click', () => closeModal('#productModal'));
     $('#productModal').addEventListener('click', (event) => {
@@ -926,6 +1142,7 @@
       renderTeams();
       renderGrid();
       renderPicks();
+      renderShowcase();
       renderCart();
     } catch (err) {
       $('#productGrid').innerHTML = '';

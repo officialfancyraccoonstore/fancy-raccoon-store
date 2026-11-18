@@ -13,6 +13,10 @@ services:
         value: rocket107
       - key: ADMIN_SECRET
         sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: fancyraccoon
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_CHAT_ID

@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const store = require('./lib/store');
 const { sendOrderEmails, emailConfigured, OWNER_EMAIL } = require('./lib/email');
 const { notifyOrder, notificationsConfigured } = require('./lib/notify');
+const cloud = require('./lib/cloud');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -115,6 +116,8 @@ app.get('/api/health', (req, res) => {
     emailConfigured: emailConfigured(),
     notificationsConfigured: notificationsConfigured(),
     ownerEmail: OWNER_EMAIL,
+    storage: cloud.status(),
+    storageDetail: cloud.detail(),
     time: new Date().toISOString(),
   });
 });
@@ -365,6 +368,8 @@ app.get('/api/admin/stats', requireAdmin, (req, res) => {
     emailConfigured: emailConfigured(),
     notificationsConfigured: notificationsConfigured(),
     ownerEmail: OWNER_EMAIL,
+    storage: cloud.status(),
+    storageDetail: cloud.detail(),
   });
 });
 
@@ -415,13 +420,17 @@ app.post('/api/admin/orders/:id/resend', requireAdmin, async (req, res, next) =>
   }
 });
 
-app.get('/api/admin/uploads/:id', requireAdmin, (req, res) => {
+app.get('/api/admin/uploads/:id', requireAdmin, async (req, res) => {
   const record = store.getUpload(req.params.id);
   if (!record) return res.status(404).json({ error: 'Image not found.' });
   const filePath = path.join(REFERENCE_DIR, path.basename(record.file));
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Image file is missing on disk.' });
   res.setHeader('Cache-Control', 'private, max-age=300');
-  res.sendFile(filePath);
+  if (fs.existsSync(filePath)) return res.sendFile(filePath);
+  // The server disk is wiped on every redeploy, so fall back to the cloud copy.
+  const buffer = await cloud.getUploadBuffer(record.id);
+  if (!buffer) return res.status(404).json({ error: 'Image file is missing on disk.' });
+  res.setHeader('Content-Type', record.mime || 'image/jpeg');
+  res.send(buffer);
 });
 
 app.get('/api/admin/products', requireAdmin, (req, res) => {
@@ -493,10 +502,26 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on our side. Please try again.' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Fancy Raccoon store running at http://localhost:${PORT}`);
-  console.log(`Orders are emailed to: ${OWNER_EMAIL}`);
-  console.log(`Email: ${emailConfigured() ? 'configured' : 'not configured (orders still saved + visible in admin)'}`);
-  console.log(`Phone alerts: ${notificationsConfigured() ? 'configured' : 'not configured'}`);
-  console.log(`Admin dashboard: http://localhost:${PORT}/admin`);
-});
+async function start() {
+  // Load the cloud copy of orders before accepting traffic (falls back to local disk).
+  try {
+    await cloud.init(store);
+  } catch (err) {
+    console.error(`[cloud] storage mirror unavailable: ${err.message}`);
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Fancy Raccoon store running at http://localhost:${PORT}`);
+    console.log(`Orders are emailed to: ${OWNER_EMAIL}`);
+    console.log(`Email: ${emailConfigured() ? 'configured' : 'not configured (orders still saved + visible in admin)'}`);
+    console.log(`Phone alerts: ${notificationsConfigured() ? 'configured' : 'not configured'}`);
+    console.log(
+      `Order storage: ${
+        cloud.enabled() ? cloud.label() : 'local disk (temporary — set DATABASE_URL to keep orders)'
+      }`
+    );
+    console.log(`Admin dashboard: http://localhost:${PORT}/admin`);
+  });
+}
+
+start();

@@ -144,6 +144,17 @@
       : phoneOn
       ? `📱 Order alerts are being sent to your phone`
       : `Orders are saved here — email and phone alerts are off`;
+
+    const storageNote = $('#storageStatus');
+    if (storageNote) {
+      const permanent = payload.storage === 'cloud';
+      storageNote.className = `email-status ${permanent ? 'ok' : 'warn'}`;
+      storageNote.innerHTML = permanent
+        ? `☁ Orders are stored permanently — restarts and redeploys will not delete them`
+        : payload.storage === 'cloud-error'
+        ? `⚠ Cloud storage is set up but not reachable — orders are temporary for now`
+        : `⚠ Orders are only on the server disk — they reset when the site redeploys`;
+    }
   }
 
   function renderStatusFilters() {
@@ -506,6 +517,51 @@
     } catch (err) {
       showLogin();
     }
+  }
+
+  // --- installable app (PWA)
+  let installPrompt = null;
+  const installBtn = $('#installAppBtn');
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    if (installBtn) installBtn.hidden = false;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    if (installBtn) installBtn.hidden = true;
+    toast('Dashboard installed on this device.');
+  });
+
+  if (installBtn) {
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (standalone) installBtn.hidden = true;
+    else if (isIos) installBtn.hidden = false;
+
+    installBtn.addEventListener('click', async () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        try {
+          await installPrompt.userChoice;
+        } catch (err) {
+          /* dismissed */
+        }
+        installPrompt = null;
+        installBtn.hidden = true;
+        return;
+      }
+      toast(isIos ? 'Tap Share, then “Add to Home Screen”.' : 'Open the browser menu, then “Install app”.');
+    });
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
   }
 
   document.addEventListener('DOMContentLoaded', boot);
