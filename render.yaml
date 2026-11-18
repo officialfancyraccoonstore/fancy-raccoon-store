@@ -12,7 +12,17 @@ services:
       - key: ADMIN_PASSWORD
         value: rocket107
       - key: ADMIN_SECRET
-        value: rocket107
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        value: officialfancyraccoon.store@gmail.com
+      - key: MAIL_FROM_NAME
+        value: Fancy Raccoon
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT

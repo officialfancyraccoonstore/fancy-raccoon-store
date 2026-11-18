@@ -8,6 +8,7 @@ const path = require('path');
 const crypto = require('crypto');
 const store = require('./lib/store');
 const { sendOrderEmails, emailConfigured, OWNER_EMAIL } = require('./lib/email');
+const { notifyOrder, notificationsConfigured } = require('./lib/notify');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -109,11 +110,22 @@ const upload = multer({
 
 // -------------------------------------------------------------- public API
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, emailConfigured: emailConfigured(), ownerEmail: OWNER_EMAIL, time: new Date().toISOString() });
+  res.json({
+    ok: true,
+    emailConfigured: emailConfigured(),
+    notificationsConfigured: notificationsConfigured(),
+    ownerEmail: OWNER_EMAIL,
+    time: new Date().toISOString(),
+  });
 });
 
 app.get('/api/config', (req, res) => {
-  res.json({ pricing: PRICING, ownerEmail: OWNER_EMAIL, emailConfigured: emailConfigured() });
+  res.json({
+    pricing: PRICING,
+    ownerEmail: OWNER_EMAIL,
+    emailConfigured: emailConfigured(),
+    notificationsConfigured: notificationsConfigured(),
+  });
 });
 
 app.get('/api/products', (req, res) => {
@@ -156,6 +168,23 @@ const PAYMENTS = {
 
 function badRequest(res, message) {
   return res.status(400).json({ error: message });
+}
+
+// Emails and phone alerts are slow (a mail API can take several seconds). They run
+// after the customer already has their confirmation, so checkout never waits on them.
+async function dispatchNotifications(order) {
+  const [emailResult, notifyResult] = await Promise.all([
+    sendOrderEmails(order).catch((err) => ({ status: 'failed', detail: err.message })),
+    notifyOrder(order).catch((err) => ({ status: 'failed', detail: err.message })),
+  ]);
+  store.updateOrder(order.id, {
+    emailStatus: emailResult.status,
+    emailDetail: emailResult.detail || '',
+    emailSentAt: emailResult.status === 'sent' ? new Date().toISOString() : null,
+    notifyStatus: notifyResult.status,
+    notifyDetail: notifyResult.detail || notifyResult.channels || '',
+    notifySentAt: notifyResult.status === 'sent' ? new Date().toISOString() : null,
+  });
 }
 
 app.post('/api/orders', async (req, res, next) => {
@@ -272,21 +301,14 @@ app.post('/api/orders', async (req, res, next) => {
 
     store.addOrder(order);
 
-    const emailResult = await sendOrderEmails(order);
-    const updated = store.updateOrder(order.id, {
-      emailStatus: emailResult.status,
-      emailDetail: emailResult.detail || '',
-      emailSentAt: emailResult.status === 'sent' ? new Date().toISOString() : null,
-    });
-
     res.status(201).json({
       order: {
-        id: updated.id,
-        code: updated.code,
-        total: updated.total,
-        shipping: updated.shipping,
-        subtotal: updated.subtotal,
-        items: updated.items.map((i) => ({
+        id: order.id,
+        code: order.code,
+        total: order.total,
+        shipping: order.shipping,
+        subtotal: order.subtotal,
+        items: order.items.map((i) => ({
           productName: i.productName,
           size: i.size,
           qty: i.qty,
@@ -295,9 +317,14 @@ app.post('/api/orders', async (req, res, next) => {
           printNumber: i.printNumber,
           lineTotal: i.lineTotal,
         })),
-        customer: { name: updated.customer.name, email: updated.customer.email },
+        customer: { name: order.customer.name, email: order.customer.email },
       },
-      email: { status: emailResult.status, ownerEmail: OWNER_EMAIL },
+      email: { status: 'pending', ownerEmail: OWNER_EMAIL },
+      notify: { status: 'pending' },
+    });
+
+    dispatchNotifications(order).catch((err) => {
+      console.error(`[order ${order.code}] notifications failed: ${err.message}`);
     });
   } catch (err) {
     next(err);
@@ -333,7 +360,12 @@ app.get('/api/admin/session', (req, res) => {
 });
 
 app.get('/api/admin/stats', requireAdmin, (req, res) => {
-  res.json({ stats: store.stats(), emailConfigured: emailConfigured(), ownerEmail: OWNER_EMAIL });
+  res.json({
+    stats: store.stats(),
+    emailConfigured: emailConfigured(),
+    notificationsConfigured: notificationsConfigured(),
+    ownerEmail: OWNER_EMAIL,
+  });
 });
 
 app.get('/api/admin/orders', requireAdmin, (req, res) => {
@@ -368,12 +400,16 @@ app.post('/api/admin/orders/:id/resend', requireAdmin, async (req, res, next) =>
     const order = store.getOrder(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found.' });
     const result = await sendOrderEmails(order);
+    const notifyResult = await notifyOrder(order);
     store.updateOrder(order.id, {
       emailStatus: result.status,
       emailDetail: result.detail || '',
       emailSentAt: result.status === 'sent' ? new Date().toISOString() : order.emailSentAt,
+      notifyStatus: notifyResult.status,
+      notifyDetail: notifyResult.detail || notifyResult.channels || '',
+      notifySentAt: notifyResult.status === 'sent' ? new Date().toISOString() : order.notifySentAt,
     });
-    res.json({ email: result });
+    res.json({ email: result, notify: notifyResult });
   } catch (err) {
     next(err);
   }
@@ -460,6 +496,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Fancy Raccoon store running at http://localhost:${PORT}`);
   console.log(`Orders are emailed to: ${OWNER_EMAIL}`);
-  console.log(`SMTP: ${emailConfigured() ? 'configured' : 'not configured (orders still saved + visible in admin)'}`);
+  console.log(`Email: ${emailConfigured() ? 'configured' : 'not configured (orders still saved + visible in admin)'}`);
+  console.log(`Phone alerts: ${notificationsConfigured() ? 'configured' : 'not configured'}`);
   console.log(`Admin dashboard: http://localhost:${PORT}/admin`);
 });
