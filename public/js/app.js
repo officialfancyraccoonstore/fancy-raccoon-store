@@ -19,7 +19,7 @@
     products: [],
     pricing: { customizationFee: 99, shippingFlat: 79, freeShippingOver: 1499 },
     cart: [],
-    filters: { q: '', category: 'all', team: 'all', variant: 'fan', sort: 'featured' },
+    filters: { q: '', category: 'all', team: 'all', league: 'all', variant: 'fan', sort: 'featured' },
     active: null,
     affinity: { teams: {}, categories: {}, variants: {} },
   };
@@ -206,23 +206,28 @@
   }
 
   function renderTeams() {
+    const league = state.filters.league;
     const teams = [];
     const seen = new Set();
     for (const product of state.products) {
+      if (league !== 'all' && product.league !== league) continue;
       if (seen.has(product.team)) continue;
       seen.add(product.team);
       teams.push(product);
     }
-    $('#teamRail').innerHTML = teams
+    teams.sort((a, b) => b.sold - a.sold);
+    const shown = league === 'all' ? teams.slice(0, 24) : teams;
+
+    $('#teamRail').innerHTML = shown
       .map(
         (p) => `<button class="team-card" type="button" data-team="${esc(p.team)}">
           <span class="team-dot" style="background:linear-gradient(140deg,${esc(p.colors.primary)},${esc(p.colors.secondary)})">${teamInitials(p.team)}</span>
-          <span><strong>${esc(p.team)}</strong><span>${p.category === 'club' ? 'European club' : 'National team'}</span></span>
+          <span><strong>${esc(p.team)}</strong><span>${esc(p.league || (p.category === 'club' ? 'Club' : 'National team'))}</span></span>
         </button>`
       )
       .join('');
 
-    const chips = ['All teams', ...teams.map((p) => p.team)];
+    const chips = ['All teams', ...shown.map((p) => p.team)];
     $('#teamChips').innerHTML = chips
       .map(
         (team) =>
@@ -256,7 +261,7 @@
         ${productVisual(product)}
       </div>
       <div class="pc-body">
-        <span class="pc-team">${esc(product.team)} · ${product.category === 'club' ? 'Club' : 'National'}</span>
+        <span class="pc-team">${esc(product.team)} · ${esc(product.league || (product.category === 'club' ? 'Club' : 'National'))}</span>
         <h3 class="pc-name">${esc(product.name)}</h3>
         <div class="pc-meta"><span class="star">★</span>${product.rating.toFixed(1)} <span>·</span> ${stockLabel(product)}</div>
         <div class="pc-bottom">
@@ -271,15 +276,16 @@
   }
 
   function filteredProducts() {
-    const { q, category, team, variant, sort } = state.filters;
+    const { q, category, team, league, variant, sort } = state.filters;
     let list = state.products.slice();
     if (category !== 'all') list = list.filter((p) => p.category === category);
+    if (league !== 'all') list = list.filter((p) => p.league === league);
     if (team !== 'all') list = list.filter((p) => p.team === team);
     if (variant === 'genuine') list = list.filter((p) => typeof p.prices.genuine === 'number');
     if (q.trim()) {
       const needle = q.trim().toLowerCase();
       list = list.filter((p) =>
-        [p.name, p.team, p.category, p.kit, p.blurb].join(' ').toLowerCase().includes(needle)
+        [p.name, p.team, p.category, p.league, p.kit, p.blurb].join(' ').toLowerCase().includes(needle)
       );
     }
     switch (sort) {
@@ -745,6 +751,13 @@
 
     $('#searchInput').addEventListener('input', (event) => {
       state.filters.q = event.target.value;
+      renderGrid();
+    });
+
+    $('#leagueSelect').addEventListener('change', (event) => {
+      state.filters.league = event.target.value;
+      state.filters.team = 'all';
+      renderTeams();
       renderGrid();
     });
 

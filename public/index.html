@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-palette="roast">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var p=localStorage.getItem('fr:palette:v1');document.documentElement.setAttribute('data-palette',p||'roast')}catch(e){document.documentElement.setAttribute('data-palette','roast')}</script>
 <title>Fancy Raccoon — Custom Football Jerseys for India &amp; Nepal</title>
 <meta name="description" content="Custom football jerseys for European clubs and national teams. Affordable fan-made look-alike jerseys from ₹499 and original genuine kits, customised with your name, number, photo or design brief. Delivered across India and Nepal.">
 <link rel="canonical" href="__SITE_URL__/">
-<meta name="theme-color" content="#0b0c10">
+<meta name="theme-color" content="#f5ecdc">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fancy Raccoon">
 <meta property="og:locale" content="en_IN">
@@ -17,15 +18,16 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Fancy Raccoon — custom football jerseys, wear your own name">
+<meta property="og:image:alt" content="Fancy Raccoon — custom football jerseys, wear your own design">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fancy Raccoon — Custom Football Jerseys for India &amp; Nepal">
 <meta name="twitter:description" content="Fan-made look-alike jerseys from ₹499, original kits at their actual price. Add your name, number and design.">
 <meta name="twitter:image" content="__SITE_URL__/img/og-cover.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v=5">
+<link rel="stylesheet" href="/css/theme.css?v=5">
 <link rel="icon" href="/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 </head>
@@ -65,8 +67,12 @@
     <div class="shell hero-grid">
       <div class="hero-copy">
         <p class="eyebrow"><span class="dot"></span> Made to order · India &amp; Nepal</p>
-        <h1>Wear your <em>own name</em><br>on the badge.</h1>
-        <p class="lede">Affordable fan-made look-alike jerseys from ₹499 and original genuine kits at the actual price — for the clubs and national teams you watch every week. Pick a jersey, then make it yours: name, number, your own design, a reference photo or a description of exactly what you want.</p>
+        <h1 class="hero-title">
+          <span class="ht-line">Wear your own</span>
+          <span class="ht-accent">design.</span>
+          <span class="ht-sub">Made <em>Your</em> <span class="ht-mark">WAY</span></span>
+        </h1>
+        <p class="lede">Affordable fan-made look-alike jerseys from ₹499 and original genuine kits at the actual price — for the clubs and national teams you watch every week. Pick a jersey, then make it yours: your name, your number, your design, a reference photo or a brief in your own words.</p>
         <div class="hero-cta">
           <button class="btn btn-primary" id="heroCustomise" type="button">Customise a jersey</button>
           <a class="btn btn-ghost" href="#collection">Browse the drop</a>
@@ -77,12 +83,21 @@
           <div><dt>4.9★</dt><dd>from 600+ fans</dd></div>
         </dl>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="hero-glow"></div>
-        <div class="jersey-stack" id="heroStack"></div>
+      <div class="hero-visual">
+        <div class="hero-poster">
+          <div class="hero-poster-top"><span>Fancy Raccoon · 2026</span><span>Custom kit 01</span></div>
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="jersey-stack" id="heroStack" aria-hidden="true"></div>
+          <span class="hero-sticker" aria-hidden="true">Made<br>Your<br>WAY</span>
+          <div class="hero-swatches" id="heroSwatches" aria-hidden="true">
+            <div class="swatch"><span class="swatch-chip"></span></div>
+            <div class="swatch"><span class="swatch-chip"></span></div>
+            <div class="swatch"><span class="swatch-chip"></span></div>
+          </div>
+        </div>
         <div class="hero-tag">
           <span class="hero-tag-dot"></span>
-          <div><strong>Your name. Your number.</strong><small>Every jersey personalised free of charge</small></div>
+          <div><strong>Your name. Your number. Your design.</strong><small>Every jersey personalised free of charge</small></div>
         </div>
       </div>
     </div>
@@ -123,7 +138,7 @@
         <p class="eyebrow">Shop by team</p>
         <h2>Pick your colours</h2>
       </div>
-      <p class="section-note">Five European giants and nine national sides, every one of them customisable.</p>
+      <p class="section-note">Every club from the Premier League, La Liga, Serie A, Bundesliga, Ligue 1 and the Champions League, plus nine national sides — all customisable.</p>
     </div>
     <div class="team-rail" id="teamRail"></div>
   </section>
@@ -135,7 +150,7 @@
         <p class="eyebrow">The collection</p>
         <h2>Jerseys built for matchday</h2>
       </div>
-      <p class="section-note">Choose an affordable fan-made look-alike or the original genuine kit. Upload a photo or describe your design and we’ll customise it for you. 10 of each jersey in stock.</p>
+      <p class="section-note">Over 100 club and national kits. Choose an affordable fan-made look-alike or the original genuine kit, then upload a photo or describe your design. 10 of each jersey in stock.</p>
     </div>
 
     <div class="filters">
@@ -152,6 +167,19 @@
         <label class="search">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
           <input type="search" id="searchInput" placeholder="Search a club, country or kit" aria-label="Search jerseys">
+        </label>
+        <label class="sort">
+          <span>League</span>
+          <select id="leagueSelect">
+            <option value="all">All leagues</option>
+            <option value="Premier League">Premier League</option>
+            <option value="La Liga">La Liga</option>
+            <option value="Serie A">Serie A</option>
+            <option value="Bundesliga">Bundesliga</option>
+            <option value="Ligue 1">Ligue 1</option>
+            <option value="Champions League">Champions League</option>
+            <option value="National teams">National teams</option>
+          </select>
         </label>
         <label class="sort">
           <span>Sort</span>
@@ -492,6 +520,15 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- PALETTE DOCK -->
+<div class="palette-dock" id="paletteDock">
+  <div class="palette-panel" id="palettePanel" role="group" aria-label="Choose a colour palette">
+    <p class="palette-title">Pick a palette</p>
+    <div id="paletteList"></div>
+  </div>
+  <button class="palette-toggle" id="paletteToggle" type="button" aria-expanded="false" aria-controls="palettePanel">Palette</button>
+</div>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -531,6 +568,8 @@
   ]
 }
 </script>
-<script src="/js/app.js" defer></script>
+<script src="/js/app.js?v=5" defer></script>
+<script src="/js/palette.js?v=5" defer></script>
+<script src="/js/theme.js?v=5" defer></script>
 </body>
 </html>

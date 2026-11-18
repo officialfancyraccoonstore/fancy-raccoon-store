@@ -1,0 +1,140 @@
+/* ============================================================
+   Fancy Raccoon — palette themes
+   Loaded after styles.css. Each palette defines the same tokens,
+   so the entire site recolours from a single attribute on <html>.
+   ============================================================ */
+
+/* default: Roast (deep teal · cream · orange) */
+:root{
+  --paper:#f5ecdc;
+  --paper-2:#ece0cb;
+  --card:#fffaf0;
+  --ink:#0e3a35;
+  --ink-soft:#31544f;
+  --muted-ink:#6b7d78;
+  --pop:#f2600f;
+  --pop-ink:#fff8ef;
+  --deep:#0e3a35;
+  --deep-ink:#f7f0e2;
+  --line-soft:rgba(14,58,53,.18);
+  --line-2:rgba(14,58,53,.42);
+  --sw1:#0e3a35;
+  --sw2:#f5ecdc;
+  --sw3:#f2600f;
+}
+
+html[data-palette="glacier"]{
+  --paper:#eef4fa;
+  --paper-2:#dceaf7;
+  --card:#ffffff;
+  --ink:#14294d;
+  --ink-soft:#36537d;
+  --muted-ink:#6b7d95;
+  --pop:#f4e733;
+  --pop-ink:#14294d;
+  --deep:#14294d;
+  --deep-ink:#eef4fa;
+  --line-soft:rgba(20,41,77,.16);
+  --line-2:rgba(20,41,77,.42);
+  --sw1:#8ecbf0;
+  --sw2:#14294d;
+  --sw3:#f4e733;
+}
+
+html[data-palette="orchid"]{
+  --paper:#f7f2e9;
+  --paper-2:#ece1d2;
+  --card:#fffdf8;
+  --ink:#17161a;
+  --ink-soft:#3d3a42;
+  --muted-ink:#77717c;
+  --pop:#e53f9b;
+  --pop-ink:#fffdf8;
+  --deep:#17161a;
+  --deep-ink:#f7f2e9;
+  --line-soft:rgba(23,22,26,.16);
+  --line-2:rgba(23,22,26,.42);
+  --sw1:#f3ece0;
+  --sw2:#17161a;
+  --sw3:#e53f9b;
+}
+
+html[data-palette="volta"]{
+  --paper:#f3f1ec;
+  --paper-2:#e4e0d6;
+  --card:#fffdf9;
+  --ink:#1c1c1e;
+  --ink-soft:#3a3a3e;
+  --muted-ink:#74737a;
+  --pop:#1f63ff;
+  --pop-ink:#ffffff;
+  --deep:#1c1c1e;
+  --deep-ink:#f3f1ec;
+  --line-soft:rgba(28,28,30,.16);
+  --line-2:rgba(28,28,30,.42);
+  --sw1:#1d1d1f;
+  --sw2:#d8cbb3;
+  --sw3:#1f63ff;
+}
+
+::selection{background:var(--pop);color:var(--pop-ink);}
+*{scrollbar-color:var(--pop) var(--paper-2)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--paper-2)}
+::-webkit-scrollbar-thumb{background:var(--ink);border:2px solid var(--paper-2);border-radius:99px}
+
+/* ---------- palette dock ---------- */
+.palette-dock{
+  position:fixed;right:16px;bottom:16px;z-index:125;
+  display:flex;flex-direction:column;align-items:flex-end;gap:9px;
+  font-family:var(--body);
+}
+.palette-toggle{
+  display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);
+  border:2px solid var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  box-shadow:4px 4px 0 var(--pop);transition:transform .2s,box-shadow .2s;
+}
+.palette-toggle:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--pop)}
+.palette-toggle .pd-dots{display:flex;gap:3px}
+.pd-dot{width:9px;height:9px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+.pd-dot:nth-child(1){background:var(--sw1)}
+.pd-dot:nth-child(2){background:var(--sw2)}
+.pd-dot:nth-child(3){background:var(--sw3)}
+.palette-panel{
+  width:188px;background:var(--paper);border:2px solid var(--ink);border-radius:6px;
+  padding:10px;box-shadow:8px 8px 0 var(--ink);display:none;
+}
+.palette-dock.open .palette-panel{display:block;animation:pd-in .18s ease-out}
+@keyframes pd-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.palette-title{margin:2px 2px 9px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.palette-option{
+  display:flex;align-items:center;justify-content:center;width:100%;background:transparent;
+  border:2px solid transparent;border-radius:4px;padding:7px;cursor:pointer;
+  color:var(--ink);font-family:inherit;transition:.15s;
+}
+.palette-option:hover{background:var(--paper-2)}
+.palette-option[aria-pressed="true"]{border-color:var(--ink);background:var(--card)}
+.palette-chips{display:flex;gap:4px;width:100%}
+.palette-chips i{display:block;flex:1;height:34px;border-radius:3px;border:1px solid rgba(0,0,0,.18)}
+
+/* ---------- scroll reveal (content is always visible; the animation is additive) ---------- */
+.reveal{opacity:1;transform:none}
+.reveal.in{animation:rise .62s cubic-bezier(.2,.7,.2,1) both}
+.reveal[data-d="1"].in{animation-delay:.07s}
+.reveal[data-d="2"].in{animation-delay:.14s}
+.reveal[data-d="3"].in{animation-delay:.21s}
+@keyframes rise{from{opacity:.001;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* subtle poster float on the hero frame */
+.hero-poster:hover{box-shadow:18px 18px 0 var(--pop)}
+
+@media (max-width:640px){
+  .palette-dock{left:12px;right:12px;bottom:12px;align-items:stretch}
+  .palette-toggle{justify-content:center}
+  .palette-panel{width:100%}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal.in{animation:none}
+}

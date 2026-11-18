@@ -137,10 +137,13 @@
       <div class="stat"><span>Customers</span><strong>${s.customers || 0}</strong></div>`;
 
     const configured = payload.emailConfigured;
-    $('#emailStatus').className = `email-status ${configured ? 'ok' : 'warn'}`;
+    const phoneOn = payload.notificationsConfigured;
+    $('#emailStatus').className = `email-status ${configured || phoneOn ? 'ok' : 'warn'}`;
     $('#emailStatus').innerHTML = configured
       ? `✔ Orders emailing to ${esc(payload.ownerEmail)}`
-      : `Orders are saved here — email notifications are off`;
+      : phoneOn
+      ? `📱 Order alerts are being sent to your phone`
+      : `Orders are saved here — email and phone alerts are off`;
   }
 
   function renderStatusFilters() {
@@ -265,7 +268,16 @@
           }.</div>`
         : order.emailStatus === 'failed'
         ? `<div class="mail-banner err">⚠ Email delivery failed${order.emailDetail ? `: ${esc(order.emailDetail)}` : ''}. The order is saved — use “Resend email”.</div>`
-        : `<div class="mail-banner warn">Email notifications are off. Every order, customer detail and reference photo is saved here in the dashboard — open <strong>Orders</strong> to manage them. You can switch email on later at any time (see the setup guide).</div>`;
+        : `<div class="mail-banner warn">Email notifications are off. Every order, customer detail and reference photo is saved here in the dashboard — open <strong>Orders</strong> to manage them. You can switch email or phone alerts on later at any time (see the setup guide).</div>`;
+
+    const notifyBanner =
+      order.notifyStatus === 'sent'
+        ? `<div class="mail-banner ok">📱 An alert with this order was sent to your phone${
+            order.notifySentAt ? ` on ${new Date(order.notifySentAt).toLocaleString('en-IN')}` : ''
+          }.</div>`
+        : order.notifyStatus === 'failed'
+        ? `<div class="mail-banner err">⚠ Phone alert failed${order.notifyDetail ? `: ${esc(order.notifyDetail)}` : ''}. The order is saved — use “Resend order email” to retry.</div>`
+        : '';
 
     $('#orderDetail').innerHTML = `
       <div class="detail-head">
@@ -277,6 +289,7 @@
         <p>${esc(order.paymentLabel || '')} · ${money(order.total)}</p>
       </div>
       ${mailBanner}
+      ${notifyBanner}
       <div class="detail-grid">
         <div class="detail-card">
           <h4>Customer</h4>

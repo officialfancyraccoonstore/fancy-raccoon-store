@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-palette="roast">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var p=localStorage.getItem('fr:palette:v1');document.documentElement.setAttribute('data-palette',p||'roast')}catch(e){document.documentElement.setAttribute('data-palette','roast')}</script>
 <title>About Fancy Raccoon — Custom Football Jersey Studio in India</title>
 <meta name="description" content="Fancy Raccoon is a custom football jersey studio for India and Nepal. Fan-made look-alike jerseys from ₹499 and original kits at their actual price, personalised with your name, number and design.">
 <link rel="canonical" href="__SITE_URL__/about">
@@ -18,8 +19,9 @@
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v=5">
+<link rel="stylesheet" href="/css/theme.css?v=5">
 <style>
   .about-hero{padding:56px 0 20px}
   .about-hero h1{font-size:clamp(34px,5vw,60px);max-width:16ch}
@@ -245,5 +247,17 @@
     <span>Made for the terraces.</span>
   </div>
 </footer>
+
+<!-- PALETTE DOCK -->
+<div class="palette-dock" id="paletteDock">
+  <div class="palette-panel" id="palettePanel" role="group" aria-label="Choose a colour palette">
+    <p class="palette-title">Pick a palette</p>
+    <div id="paletteList"></div>
+  </div>
+  <button class="palette-toggle" id="paletteToggle" type="button" aria-expanded="false" aria-controls="palettePanel">Palette</button>
+</div>
+
+<script src="/js/palette.js?v=5" defer></script>
+<script src="/js/theme.js?v=5" defer></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* Studio dashboard */
-.admin-body{background:#07080b;min-height:100vh}
+.admin-body{background:#07080b;min-height:100vh;--bg:#07080b;--bg-2:#0b0d12;--surface:#101319;--surface-2:#151922;--paper:#07080b;--paper-2:#0b0d12;--card:#101319;--ink:#f5f6f8;--ink-soft:#c7ccd6;--muted-ink:#9aa1ae;--text:#f5f6f8;--muted:#9aa1ae;--lime:#ffd84d;--pop:#ffd84d;--line:rgba(255,255,255,.09);--line-soft:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.16);--line-2:rgba(255,255,255,.16);--shadow:0 30px 60px -30px rgba(0,0,0,.9);color:var(--text)}
 .admin-header{position:sticky;top:0;z-index:40;background:rgba(7,8,11,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
 .admin-header-inner{width:min(1220px,calc(100% - 40px));margin-inline:auto;height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .admin-header-actions{display:flex;align-items:center;gap:16px}
