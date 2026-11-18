@@ -10,9 +10,9 @@ services:
       - key: OWNER_EMAIL
         value: officialfancyraccoon.store@gmail.com
       - key: ADMIN_PASSWORD
-        sync: false
+        value: rocket107
       - key: ADMIN_SECRET
-        sync: false
+        value: rocket107
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT
